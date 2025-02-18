@@ -1,4 +1,10 @@
+using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using TraskioApi.Services;
+using TraskioApi.Interfaces;
 using DotNetEnv;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 

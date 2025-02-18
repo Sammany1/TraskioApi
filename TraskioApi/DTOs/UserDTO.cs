@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using TraskioApi.Models;
+using Traskio.Models;
 
-namespace TraskioApi.DTOs;
+namespace Traskio.DTOs;
 public class UserItemDTO
 {
     public int Id { get; set; }
@@ -39,4 +39,7 @@ public class UpdateUserDTO
     [Required]
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
+
+    [StringLength(100, MinimumLength = 6)]
+    public string? Password { get; set; }
 }

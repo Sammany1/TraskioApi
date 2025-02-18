@@ -1,14 +1,13 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TraskioApi.Utils;
-using TraskioApi.Interfaces;
-using TraskioApi.Models;
-using TraskioApi.DTOs;
+using Traskio.Utils;
+using Traskio.Interfaces;
+using Traskio.Models;
+using Traskio.DTOs;
 
-namespace TraskioApi.Services;
+namespace Traskio.Services;
 public class UserService : IUserService
 {
     private readonly AppDbContext _context;
@@ -71,4 +70,27 @@ public class UserService : IUserService
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<UserItemDTO?> GetUserByEmailAsync(string email)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == email);
+        return user != null ? new UserItemDTO(user) : null;
+    }
+
+    public async Task<User?> GetFullUserByEmailAsync(string email) 
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    // public async Task<UserItemDTO?> ValidateUser(string email, string password)
+    // {
+    //     var user = await GetFullUserByEmailAsync(email);
+    //     if (user == null || !PasswordHasher.VerifyPassword(password, user.Password))
+    //     {
+    //         return null;
+    //     }
+    //     return new UserItemDTO(user);
+    // }
 }

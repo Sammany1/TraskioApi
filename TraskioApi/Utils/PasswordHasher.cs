@@ -2,7 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace TraskioApi.Utils;
+namespace Traskio.Utils;
 
 public static class PasswordHasher
 {

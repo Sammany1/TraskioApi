@@ -1,63 +1,45 @@
 using Microsoft.AspNetCore.Mvc;
+using Traskio.DTOs;
+using Traskio.Models;
+using Traskio.Interfaces;
+using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
-namespace MyAspNetCoreApp.Controllers
+namespace Traskio.Controllers
 {
+    [Authorize]
     [ApiController]
-    [Route("api/users")]
+    [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
+        private readonly int userId;
 
-        public UserController(UserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
+            userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         }
-
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetCurrentUser()
         {
-            var users = await _userService.GetAllUsers();
-            return Ok(users);
+            var user = await _userService.GetUserAsync(userId);
+            return user == null ? NotFound() : Ok(user);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(int id)
+        [HttpPut]
+        public async Task<IActionResult> UpdateCurrentUser([FromBody] UpdateUserDTO updateUserDTO)
         {
-            var user = await _userService.GetUserAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return Ok(user);
+            var updated = await _userService.UpdateUserAsync(userId, updateUserDTO);
+            return updated ? NoContent() : NotFound();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO createUserDTO)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCurrentUser()
         {
-            var userItemDTO = await _userService.CreateUserAsync(createUserDTO);
-            return CreatedAtAction(nameof(GetUser), new { id = userItemDTO.Id }, userItemDTO);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDTO updateUserDTO)
-        {
-            var updated = await _userService.UpdateUserAsync(id, updateUserDTO);
-            if (!updated)
-            {
-                return NotFound();
-            }
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            var deleted = await _userService.DeleteUserAsync(id);
-            if (!deleted)
-            {
-                return NotFound();
-            }
-            return NoContent();
+            var deleted = await _userService.DeleteUserAsync(userId);
+            return deleted ? NoContent() : NotFound();
         }
     }
 }
